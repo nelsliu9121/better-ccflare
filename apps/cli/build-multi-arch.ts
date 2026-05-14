@@ -14,7 +14,8 @@ const projectRoot = join(import.meta.dir, "../..");
 
 const platforms: Platform[] = [
 	{
-		target: "bun-linux-amd64",
+		// baseline target: no AVX2 requirement, runs on all x86_64 CPUs/VMs
+		target: "bun-linux-x64-baseline",
 		outfile: "better-ccflare-linux-amd64",
 		description: "Linux x86_64",
 	},
