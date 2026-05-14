@@ -1,6 +1,6 @@
 services:
   better-ccflare:
-    image: ghcr.io/tombii/better-ccflare:latest
+    image: ghcr.io/nelsliu9121/better-ccflare:latest
     container_name: better-ccflare
     restart: unless-stopped
     ports:
