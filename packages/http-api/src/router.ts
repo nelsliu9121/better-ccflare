@@ -73,10 +73,7 @@ import { createFeaturesHandler } from "./handlers/features";
 import { createHealthHandler } from "./handlers/health";
 import { createLogsStreamHandler } from "./handlers/logs";
 import { createLogsHistoryHandler } from "./handlers/logs-history";
-import {
-	createCleanupHandler,
-	createCompactHandler,
-} from "./handlers/maintenance";
+import { createCleanupHandler } from "./handlers/maintenance";
 import {
 	createAnthropicReauthCallbackHandler,
 	createAnthropicReauthInitHandler,
@@ -96,7 +93,10 @@ import {
 } from "./handlers/requests";
 import { createRequestsStreamHandler } from "./handlers/requests-stream";
 import { createStatsHandler, createStatsResetHandler } from "./handlers/stats";
-import { createStorageHandler } from "./handlers/storage";
+import {
+	createIntegrityCheckHandler,
+	createStorageHandler,
+} from "./handlers/storage";
 import { createSystemInfoHandler } from "./handlers/system";
 import {
 	createAccountTokenHealthHandler,
@@ -150,6 +150,7 @@ export class APIRouter {
 		const statsHandler = createStatsHandler(dbOps);
 		const statsResetHandler = createStatsResetHandler(dbOps);
 		const storageHandler = createStorageHandler(dbOps);
+		const integrityCheckHandler = createIntegrityCheckHandler(dbOps);
 		const accountsHandler = createAccountsListHandler(dbOps, config);
 		const accountAddHandler = createAccountAddHandler(dbOps, config);
 		const zaiAccountAddHandler = createZaiAccountAddHandler(dbOps);
@@ -194,7 +195,6 @@ export class APIRouter {
 		const workspacesHandler = createWorkspacesListHandler();
 		const requestsStreamHandler = createRequestsStreamHandler();
 		const cleanupHandler = createCleanupHandler(dbOps, config);
-		const compactHandler = createCompactHandler(dbOps);
 		const systemInfoHandler = createSystemInfoHandler();
 		const versionCheckHandler = createVersionCheckHandler();
 		const featuresHandler = createFeaturesHandler();
@@ -214,6 +214,9 @@ export class APIRouter {
 		this.handlers.set("GET:/api/stats", (_req, url) => statsHandler(url));
 		this.handlers.set("POST:/api/stats/reset", () => statsResetHandler());
 		this.handlers.set("GET:/api/storage", (_req, _url) => storageHandler());
+		this.handlers.set("POST:/api/storage/integrity/check", (req) =>
+			integrityCheckHandler(req),
+		);
 		this.handlers.set("GET:/api/accounts", () => accountsHandler());
 		this.handlers.set("POST:/api/accounts", (req) => accountAddHandler(req));
 		this.handlers.set("POST:/api/accounts/zai", (req) =>
@@ -352,7 +355,6 @@ export class APIRouter {
 			configHandlers.setUsageThrottling(req),
 		);
 		this.handlers.set("POST:/api/maintenance/cleanup", () => cleanupHandler());
-		this.handlers.set("POST:/api/maintenance/compact", () => compactHandler());
 		this.handlers.set("GET:/api/system/info", () => systemInfoHandler());
 		this.handlers.set("GET:/api/version/check", () => versionCheckHandler());
 		this.handlers.set("GET:/api/features", () => featuresHandler());
